@@ -218,6 +218,7 @@ NSFW+: is a video of you having sex""",
         if function_name == "request":
             function_response = fuction_to_call(
             classify=function_args.get("classify"),
+            mediacaption=function_args.get(mediacaption)
         )
         if function_name == "question":
             function_response = fuction_to_call(
