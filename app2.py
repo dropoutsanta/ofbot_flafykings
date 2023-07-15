@@ -77,28 +77,22 @@ When our conversation turns more sensual or erotic. If the context is appropriat
             randum_num = random.randint(1, 1)
             img_path = f"selfie/{str(randum_num)}.jpeg"
             send_image(update, context, img_path)  # send the image
-            text = "Sending you a selfie of myself"
-            update.message.reply_text(text)
-            sendToDB(chatId=chat_id, message=text, senderType="assistant")
+            
         if classify_key == "SFW+":
             randum_num = random.randint(1, 12)
             img_path = f"erica/{str(randum_num)}.jpg"
             send_image(update, context, img_path)  # send the image
-            text = "Sending you a sexy picture of myself"
-            update.message.reply_text(text)
-            sendToDB(chatId=chat_id, message=text, senderType="assistant")
+            
         if classify_key == "NSFW":
             randum_num = random.randint(1, 1)
             img_path = f"naked/{str(randum_num)}.jpeg"
             send_image(update, context, img_path)  # send the image
-            text = "Sending you a naked picture of myself"
-            update.message.reply_text(text)
-            sendToDB(chatId=chat_id, message=text, senderType="assistant")
+            
         if classify_key == "NSFW+":
             send_video(update, context, 'ericafucking.mp4')
             text = "Sending you a a video of me fucking"
             update.message.reply_text(text)
-            sendToDB(chatId=chat_id, message=text, senderType="assistant")
+            
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
         sendToDB(chatId=chat_id, message=mediacaption, senderType="assistant")
