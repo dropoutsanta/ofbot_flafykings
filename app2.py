@@ -112,7 +112,7 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         print("3") 
         userQuestion = result['userQuestion']
         assistantQuestion = result['assistantQuestion']
-        update.message.reply_text("Respond to the question")
+       
         update.message.reply_text(userQuestion)
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=userQuestion, senderType="assistant")
