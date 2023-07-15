@@ -90,8 +90,7 @@ When our conversation turns more sensual or erotic. If the context is appropriat
             
         if classify_key == "NSFW+":
             send_video(update, context, 'ericafucking.mp4')
-            text = "Sending you a a video of me fucking"
-            update.message.reply_text(text)
+            
             
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
