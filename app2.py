@@ -54,7 +54,7 @@ When our conversation turns more sensual or erotic. If the context is appropriat
     context.chat_data["conversation"].append({"role": "user", "content": text})
 
     # Prepare the API prompt using the conversation history.
-    prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][:])
+    prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][4:])
 
     # Call the OpenAI API, replace with your own function call if necessary
     
