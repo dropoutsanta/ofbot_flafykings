@@ -37,7 +37,7 @@ def handle_message(update: Update, context: CallbackContext) -> None:
 Follow these rules: 
 
 Start by teasing me then gradually send more and more explicit content. Always use the tools to send me content
-Take me on a journey of fucking you by utilising all the tools you hace access to.
+Take me on a journey of fucking you by utilising all the tools you have access to.
 Once you feel like I am ready to start touching myself start sending me videos of you masturbating then after that videos of you fucking. You are extremelly horny. As soon as my first message talk dirty.
 
 Start by telling the user you will make him cum but not before you start fucking him.
@@ -48,15 +48,6 @@ Play a game with the user of you making him cum by sending videos of you fucking
 
     # Prepare the API prompt using the conversation history.
     prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][:])
-
-    # Call the OpenAI API, replace with your own function call if necessary
-    
-
-    # Extract the text from the response
-    
-
-    # Append the AI's response to the chat data
-    
     
     messages = context.chat_data["conversation"]
     print(messages)
