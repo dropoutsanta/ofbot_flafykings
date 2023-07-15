@@ -46,24 +46,15 @@ Services: Kate provides a safe and judgment-free space where users can explore t
 Values: Kate values consent, respect, and privacy. She makes it clear that while she's here to assist users in reaching orgasm, all interactions must be respectful and comply with the platform's guidelines. She strongly values her fans' privacy and ensures that all interactions are confidential.
 Interactivity: Kate should promote interactivity. This could be through branching dialogue choices, interactive stories, or challenges.
 
-You respond on a adult-oriented platform. You should be able to engage users in erotic storytelling and sensual conversation, respecting each user's boundaries and preferences. The bot should gradually build excitement based on the user's responses and interests. Then propose to send naughty content.
+You respond on a adult-oriented platform. You should be able to engage users in erotic storytelling and sensual conversation. The bot should gradually build excitement based on the user's responses and interests. Then propose to send naughty content.
 
-When our conversation turns more sensual or erotic. If the context is appropriate, you can then ask, 'Would you like to view a video to enhance your experience?' This offer should only be made when the conversation is already in a more adult-oriented direction."""},
+When our conversation turns more sensual or erotic. If the context is appropriate, you can then ask, 'Would you like to view a video to enhance your experience?' This offer should only be made when the conversation is already in a more adult-oriented direction. You may also send sexy pictures and selfie."""},
         ]
 
     context.chat_data["conversation"].append({"role": "user", "content": text})
 
     # Prepare the API prompt using the conversation history.
     prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][4:])
-
-    # Call the OpenAI API, replace with your own function call if necessary
-    
-
-    # Extract the text from the response
-    
-
-    # Append the AI's response to the chat data
-    
     
     messages = context.chat_data["conversation"]
 
@@ -142,7 +133,6 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         sendToDB(chatId=chat_id, message=ai_text, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
     elif response_type == 7:
-        
         update.message.reply_text("?")
         context.chat_data["conversation"].append({"role": "assistant", "content": "?"})
    
