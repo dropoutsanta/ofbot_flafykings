@@ -6,6 +6,7 @@ from checkResponse import check_response_type
 from telegram import InputFile
 import random
 import json
+from superbase import sendToDB
 
 
 # Instantiate a Telegram Bot object
@@ -28,6 +29,7 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     print(text)
     # Get the conversation history from the context, or initialize it if it doesn't exist.
     chat_id = update.message.chat_id
+    sendToDB(chatId=chat_id, message=text, senderType="user")
 
     if "conversation" not in context.chat_data:
         context.chat_data["conversation"] = [
@@ -75,20 +77,28 @@ When our conversation turns more sensual or erotic. If the context is appropriat
             randum_num = random.randint(1, 1)
             img_path = f"selfie/{str(randum_num)}.jpeg"
             send_image(update, context, img_path)  # send the image
-            update.message.reply_text("Sending you a selfie of myself")
+            text = "Sending you a selfie of myself"
+            update.message.reply_text(text)
+            sendToDB(chatId=chat_id, message=text, senderType="assistant")
         if classify_key == "SFW+":
             randum_num = random.randint(1, 12)
             img_path = f"erica/{str(randum_num)}.jpg"
             send_image(update, context, img_path)  # send the image
-            update.message.reply_text("Sending you a sexy picture of myself")
+            text = "Sending you a sexy picture of myself"
+            update.message.reply_text(text)
+            sendToDB(chatId=chat_id, message=text, senderType="assistant")
         if classify_key == "NSFW":
             randum_num = random.randint(1, 1)
             img_path = f"naked/{str(randum_num)}.jpeg"
             send_image(update, context, img_path)  # send the image
-            update.message.reply_text("Sending you a naked picture of myself")
+            text = "Sending you a naked picture of myself"
+            update.message.reply_text(text)
+            sendToDB(chatId=chat_id, message=text, senderType="assistant")
         if classify_key == "NSFW+":
             send_video(update, context, 'ericafucking.mp4')
-            update.message.reply_text("Sending you a a video of me fucking")
+            text = "Sending you a a video of me fucking"
+            update.message.reply_text(text)
+            sendToDB(chatId=chat_id, message=text, senderType="assistant")
 
 
     
@@ -96,8 +106,8 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         print("2")
         loaded = json.loads(result)
         ai_text = loaded['content']
-       
         update.message.reply_text(ai_text)
+        sendToDB(chatId=chat_id, message=ai_text, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
 
     elif response_type == 3:
@@ -107,6 +117,8 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         update.message.reply_text("Respond to the question")
         update.message.reply_text(userQuestion)
         update.message.reply_text(assistantQuestion)
+        sendToDB(chatId=chat_id, message=userQuestion, senderType="assistant")
+        sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
         
     elif response_type == 4:
@@ -115,17 +127,22 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         compliment = result['compliment']
         update.message.reply_text(thankyou)
         update.message.reply_text(compliment)
+        sendToDB(chatId=chat_id, message=thankyou, senderType="assistant")
+        sendToDB(chatId=chat_id, message=compliment, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": thankyou})
     elif response_type == 5:
         answerUser = result['answerUser']
         assistantQuestion = result['assistantQuestion']
         update.message.reply_text(answerUser)
         update.message.reply_text(assistantQuestion)
+        sendToDB(chatId=chat_id, message=answerUser, senderType="assistant")
+        sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
     elif response_type == 6:
         send_video(update, context, 'erica.mp4')
         ai_text = result['offer']
         update.message.reply_text(ai_text)
+        sendToDB(chatId=chat_id, message=ai_text, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
     elif response_type == 7:
         
