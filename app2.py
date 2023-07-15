@@ -99,6 +99,10 @@ When our conversation turns more sensual or erotic. If the context is appropriat
             text = "Sending you a a video of me fucking"
             update.message.reply_text(text)
             sendToDB(chatId=chat_id, message=text, senderType="assistant")
+        mediacaption = result['mediacaption']
+        update.message.reply_text(mediacaption)
+        sendToDB(chatId=chat_id, message=mediacaption, senderType="assistant")
+
 
 
     

@@ -17,10 +17,11 @@ def callGPT(messages):
 
 # Example dummy function hard coded to return the same weather
 # In production, this could be your backend API or an external API
-def request(classify):
+def request(classify, mediacaption):
      """Get the current weather in a given location"""
      result = {
-     "request": classify
+     "request": classify,
+     "mediacaption": mediacaption
      }
      print("REQUEST")
      print(classify)
@@ -95,9 +96,13 @@ SFW: is a selfie of you
 SFW+: is a sexy picture of you where you are wearing clothes
 NSFW: is a nude picture of you
 NSFW+: is a video of you having sex""",
+                    },
+                    "mediacaption": {
+                        "type": "string",
+                        "description": """The text to go along with the media you are sending. Include lot's of emojies.""",
                     }
                 },
-                "required": ["classify"],
+                "required": ["classify", "mediacaption"],
             },
         },
         {
