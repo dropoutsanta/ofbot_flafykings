@@ -6,7 +6,7 @@ import os
 openAIKey = os.environ.get('OPEN_AI_KEY')
 
 # Ensure that you've set your OpenAI API key
-openai.api_key = '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'
+openai.api_key = openAIKey
 
 
 
