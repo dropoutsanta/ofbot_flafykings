@@ -10,10 +10,7 @@ bots = {}
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
     print("RUNNNNNNNNING")
-    bot_data = request.json
-    print(bot_data)
     return 200
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
