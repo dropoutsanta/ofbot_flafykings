@@ -10,16 +10,9 @@ bots = {}
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
     print("RUNNNNNNNNING")
-    bot_data = request.json
-    print(bot_data)
-    return jsonify({"message": "Bot added successfully"}), 200
     
-    if bot_data:
-        bot_id = bot['id']
-        updater = setup_bot(bot_data)
-        app2.updaters.append(updater)
-
     return jsonify({"message": "Bot added successfully"}), 200
+   
    
 
         # Here you could add the logic to restart or update your service as necessary
