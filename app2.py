@@ -139,7 +139,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
             
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id)
 
 
 
@@ -150,31 +150,20 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         loaded = json.loads(result)
         ai_text = loaded['content']
         update.message.reply_text(ai_text)
-        sendToDB(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
-        context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
-        resumeText = f"Kate said: {ai_text}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
 
     elif response_type == 3:
 
         print("3") 
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
-       
-        update.message.reply_text(assistantResponse)
-        update.message.reply_text(assistantQuestion)
-        sendToDB(chatId=chat_id, message=userQuestion, senderType="assistant", bot_id=bot_id)
-        sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id)
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantResponse})
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
         resumeText = f"Kate said: {assistantResponse} and {assistantQuestion}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        update.message.reply_text(assistantResponse)
+        update.message.reply_text(assistantQuestion)
+        sendToDB(chatId=chat_id, message=assistantResponse, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id)
         
     elif response_type == 4:
         print("4")
@@ -183,41 +172,31 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         update.message.reply_text(thankyou)
         update.message.reply_text(compliment)
         sendToDB(chatId=chat_id, message=thankyou, senderType="assistant", bot_id=bot_id)
-        sendToDB(chatId=chat_id, message=compliment, senderType="assistant", bot_id=bot_id)
         context.chat_data["conversation"].append({"role": "assistant", "content": thankyou})
         context.chat_data["conversation"].append({"role": "assistant", "content": compliment})
         resumeText = f"Kate said: {thankyou} and {compliment}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=compliment, senderType="assistant", bot_id=bot_id)
+
     elif response_type == 5:
         answerUser = result['answerUser']
         assistantQuestion = result['assistantQuestion']
         update.message.reply_text(answerUser)
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=answerUser, senderType="assistant", bot_id=bot_id)
-        sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id = bot_id)
         context.chat_data["conversation"].append({"role": "assistant", "content": answerUser})
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
         resumeText = f"Kate said: {answerUser} and {assistantQuestion}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-      
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id)
+
 
     elif response_type == 6:
         send_video(update, context, 'erica.mp4')
         ai_text = result['offer']
         update.message.reply_text(ai_text)
-        sendToDB(chatId=chat_id, message=ai_text, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
         resumeText = f"Kate said: {ai_text}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
+
     elif response_type == 7:
         update.message.reply_text("?")
         context.chat_data["conversation"].append({"role": "assistant", "content": "?"})
