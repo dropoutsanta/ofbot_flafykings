@@ -240,7 +240,11 @@ def setup_bot(bot_data):
 
     return updater
 updaters = []
-    
+
+def add_updater(updater):
+    global updaters
+    updaters.append(updater)
+
 if __name__ == "__main__":
     # Fetch all the API keys and system messages
     result = getAllKeys()
@@ -256,6 +260,7 @@ if __name__ == "__main__":
         
         bot_id = bot['id']
         updater = setup_bot(bot)
-        updaters.append(updater)
+        add_updater(updater)
+        
 
 

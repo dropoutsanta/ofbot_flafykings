@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from telegram import Bot, Update
-from app2 import setup_bot
+from app2 import setup_bot, add_updater
 import app2
 
 app = Flask(__name__)
@@ -13,7 +13,8 @@ def add_bot():
     
     if bot_data:
         updater = setup_bot(bot_data)
-        app2.updaters.append(updater)
+        add_updater(updater)
+        
         return jsonify({"message": "Bot added successfully"}), 200
     else:
         return jsonify({"message": "Bot not added successfully"}), 200
