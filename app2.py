@@ -44,6 +44,19 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     language_code = user.language_code
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
+def updateDatabaseAndSummary(chatId, message, senderType, bot_id):
+    sendToDB(chatId, message, senderType, bot_id)
+    resumeText = f"Kate said: {message}"
+    summary = getSummary(chatId, bot_id)
+    newSummary = upDateSummaryGPT(summary, resumeText)
+    print(newSummary)
+    summaryDBResult = updateSummaryDB(newSummary, chatId, bot_id)
+
+# Define a new function to handle this in a new thread
+def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id):
+    Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id)).start()
+
+
 def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
     user = update.message.from_user
@@ -94,16 +107,13 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         print("1")
         classify_key = result['request']
         if classify_key == "SFW":
-            randum_num = random.randint(1, 1)
-            img_path = f"selfie/{str(randum_num)}.jpeg"
+            
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
             picture = picture_obj["url"]
             send_image_url(update, context, picture)  # send the image
             
         if classify_key == "SFW+":
-            randum_num = random.randint(1, 12)
-            img_path = f"erica/{str(randum_num)}.jpg"
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
             picture = picture_obj["url"]
@@ -121,12 +131,8 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
             
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
-        sendToDB(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id)
-        resumeText = f"Kate said: {mediacaption}"
-        summary = getSummary(chat_id, bot_id)
-        newSummary = upDateSummaryGPT(summary, resumeText)
-        print(newSummary)
-        summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
+
 
 
 
@@ -252,12 +258,9 @@ if __name__ == "__main__":
     print(result)
     bot_data = [{'api_key': row['telegram_API_key'], 'system_message': row['system_message'], 'id': row['id']} for row in result]
 
-
-
     # Setup a bot for each token
     for bot in bot_data:
         print(bot)
-        
         bot_id = bot['id']
         updater = setup_bot(bot)
         add_updater(updater)

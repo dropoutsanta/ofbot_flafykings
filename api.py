@@ -14,7 +14,6 @@ def add_bot():
     if bot_data:
         updater = setup_bot(bot_data)
         add_updater(updater)
-        
         return jsonify({"message": "Bot added successfully"}), 200
     else:
         return jsonify({"message": "Bot not added successfully"}), 200
