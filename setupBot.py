@@ -1,5 +1,6 @@
 from telegram import Bot, Update, ChatAction
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from app2.py import send_video, start, start_handler, message_handler, video_handler
 
 def setup_bot(bot_data):
     bot_token = bot_data['api_key']
