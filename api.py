@@ -9,6 +9,8 @@ bots = {}
 
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
+    print("RUNNNNNNNNING")
+    return 
     bot_token = request.json.get('bot_token')
     if bot_token:
         bot_id = bot['id']
