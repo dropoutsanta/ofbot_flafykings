@@ -56,6 +56,20 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id):
 def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id):
     Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id)).start()
 
+def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText):
+    sendToDB(chatId, message, senderType, bot_id)
+    summary = getSummary(chatId, bot_id)
+    print("SUMMARY")
+    print(summary)
+    # Get new summary
+    newSummary = upDateSummaryGPT(summary, resumeText)
+    print(newSummary)
+    summaryDBResult = updateSummaryDB(newSummary, chatId, bot_id)
+
+# Define a new function to handle this in a new thread
+def updateUserMessageAndSummaryAsync(chatId, message, senderType, bot_id, resumeText):
+    Thread(target=updateUserMessageAndSummary, args=(chatId, message, senderType, bot_id, resumeText)).start()
+
 
 def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
     context.bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
@@ -65,17 +79,9 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
     # This function will be called whenever the bot receives a message.
     text = update.message.text
     resumeText = f"{first_name} said: {text}"
-    print(resumeText)
-    # Get the conversation history from the context, or initialize it if it doesn't exist.
     chat_id = update.message.chat_id
-    sendToDB(chatId=chat_id, message=text, senderType="user", bot_id=bot_id)
-    summary = getSummary(chat_id, bot_id)
-    print("SUMMARY")
-    print(summary)
-    # Get new summary
-    newSummary = upDateSummaryGPT(summary, resumeText)
-    print(newSummary)
-    summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
+    updateUserMessageAndSummaryAsync(chatId=chat_id, message=text, senderType="user", bot_id=bot_id, resumeText=resumeText)
+    
     systemMessage = getSystemMessage(bot_id=bot_id)
     if "conversation" not in context.chat_data:
         context.chat_data["conversation"] = [
