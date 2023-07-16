@@ -1,8 +1,8 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from telegram import Bot, Update
 from app2 import setup_bot
 import app2
-import jsonify
+
 
 app = Flask(__name__)
 bots = {}
@@ -10,10 +10,7 @@ bots = {}
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
     print("RUNNNNNNNNING")
-    
     return jsonify({"message": "Bot added successfully"}), 200
-   
-   
 
         # Here you could add the logic to restart or update your service as necessary
 
