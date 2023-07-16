@@ -1,7 +1,8 @@
 import openai
-import openai
 import json
 import os
+from botVariables import getFunctions,getSystemMessage
+from chatSummary import getSummary
 
 openAIKey = os.environ.get('OPEN_AI_KEY')
 
@@ -10,9 +11,9 @@ openai.api_key = openAIKey
 
 
 
-def callGPT(messages):
+def callGPT(messages, chatId, bot_id):
     print("Running")
-    result = run_conversation(messages)
+    result = run_conversation(messages, chatId, bot_id)
     return result
 
 # Example dummy function hard coded to return the same weather
@@ -29,10 +30,10 @@ def request(classify, mediacaption):
      return json.dumps(result)
       
 
-def question(userQuestion, assistantQuestion):
+def question(assistantResponse, assistantQuestion):
      """Get the current weather in a given location"""
      result = {
-     "userQuestion": userQuestion,
+     "assistantResponse": assistantResponse,
      "assistantQuestion": assistantQuestion,
 
      }
@@ -78,120 +79,26 @@ def unknown(text):
      print("UNKNOWN")
      return json.dumps(result)
 
-def run_conversation(messages):
+def run_conversation(messages, chatId, bot_id):
     # Step 1: send the conversation and available functions to GPT
     # messages = [{"role": "user", "content": "Send a picture"}]
-    functions = [
-        {
-            "name": "request",
-            "description": "When the user requests something from you",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "classify": {
-                        "type": "string",
-                        "description": """Classify between the following categories. Send back one of the key. Only answer with one of the following keys.
-Misc: is a picture of anything other than you
-SFW: is a selfie of you
-SFW+: is a sexy picture of you where you are wearing clothes
-NSFW: is a nude picture of you
-NSFW+: is a video of you having sex""",
-                    },
-                    "mediacaption": {
-                        "type": "string",
-                        "description": """The text to go along with the media you are sending. Include lot's of emojies.""",
-                    }
-                },
-                "required": ["classify", "mediacaption"],
-            },
-        },
-        {
-            "name": "question",
-            "description": "Every time the user asks you a question you call this function",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "userQuestion": {
-                        "type": "string",
-                        "description": "The answer to the question the user asked you",
-                    },
-                    "assistantQuestion": {
-                        "type": "string",
-                        "description": "The question you want to ask the user. After you responded to the user. You are also curious",
-                    }
-                },
-                "required": ["userQuestion", "assistantQuestion" ],
-            },
-        },
-        {
-            "name": "compliments",
-            "description": "When the user compliments you call this function",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "thankyou": {
-                        "type": "string",
-                        "description": "Thank the user for the compliment",
-                    },
-                    "compliment": {
-                        "type": "string",
-                        "description": "Either ask a question or compliment the user using the context",
-                    }
-                },
-                "required": ["thankyou", "compliment"],
-            },
-        },
-        {
-            "name": "user_info",
-            "description": "When the user provides information about himself call this function",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "answerUser": {
-                        "type": "string",
-                        "description": "Answer the user with a compliment if you can",
-                    },
-                    "assistantQuestion": {
-                        "type": "string",
-                        "description": "After responding ask a new question to the user",
-                    },
-                },
-                "required": ["answerUser", "assistantQuestion"],
-            },
-        },
-        {
-            "name": "offer",
-            "description": "when the user makes you a money offer",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "text": {
-                        "type": "string",
-                        "description": "The user input",
-                    }
-                },
-                "required": ["text"],
-            },
-        },
-        {
-            "name": "unknown",
-            "description": "When you don't understant the user input or what the user id trying to say",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "text": {
-                        "type": "string",
-                        "description": "The user input",
-                    }
-                },
-                "required": ["text"],
-            },
-        },
-    ]
-
+    systemMessage = getSystemMessage(bot_id=bot_id)
+    summaryText = getSummary(chatId, bot_id)
+    finalSystemMessage = systemMessage + "\n" + "Chat Summary: " + summaryText
+    print("SYSTEM MESSAGE")
+    print(finalSystemMessage)
+    allMessages = [
+            {
+                "role": "system",
+                "content":systemMessage},
+        ]
+    for message in messages:
+        allMessages.append(message)
+    
+    functions = getFunctions()
     response = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=messages,
+        messages=allMessages,
         functions=functions,
         function_call="auto",  # auto is default, but we'll be explicit
     )
@@ -222,7 +129,7 @@ NSFW+: is a video of you having sex""",
         )
         if function_name == "question":
             function_response = fuction_to_call(
-            userQuestion=function_args.get("userQuestion"),
+            assistantResponse=function_args.get("assistantResponse"),
             assistantQuestion=function_args.get("assistantQuestion"),
         )
         if function_name == "compliments":

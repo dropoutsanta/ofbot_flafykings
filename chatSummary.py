@@ -21,12 +21,12 @@ New message: {newText}"""
         model="gpt-4",
         messages=messages,
     )  # get a new response from GPT where it can see the function response
-    response_message = response["choices"][0]["message"]
+    response_message = response["choices"][0]["message"]['content']
     return response_message
     
 
-def updateSummaryDB(summary):
-    url = "https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users?user_id=eq.123"
+def updateSummaryDB(summary, userId, bot_id):
+    url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users?user_id=eq.{userId}&bot_id=eq.{bot_id}" 
 
     payload = json.dumps({
     "conversation_summary": summary
@@ -39,8 +39,8 @@ def updateSummaryDB(summary):
     print(response.text)
 
 
-def getSummary(chatId):
-    url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users?user_id=eq.{chatId}"
+def getSummary(chatId, bot_id):
+    url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users?user_id=eq.{chatId}&bot_id=eq.{bot_id}"
 
     payload = {}
     headers = {
@@ -49,7 +49,12 @@ def getSummary(chatId):
     }
 
     response = requests.request("GET", url, headers=headers, data=payload)
-
-    print(response.text)
-    return response.text
+    response_text = response.text
+    jsonValue = json.loads(response_text)
+    print(jsonValue)
+    result = jsonValue[0]['conversation_summary']
+    print("CONVERSATION SUMMARY")
+    print(result)
+   
+    return result
 

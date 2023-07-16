@@ -11,7 +11,7 @@ def check_response_type(response):
         print("NO FUNCTION CALLED")
         # Handle the second response type
         return 2
-    elif 'userQuestion' in response:
+    elif 'assistantResponse' in response:
         return 3
     elif 'compliment' in response:
         return 4
