@@ -1,6 +1,6 @@
 from flask import Flask, request
 from telegram import Bot, Update
-from app2 import setup_bot
+from setupBot import setup_bot
 
 
 

@@ -12,6 +12,7 @@ from createUser import createUser
 from botVariables import getSystemMessage, getAPIKey, getAllKeys
 from functools import partial
 from getImages import getSFW
+from setupBot import setup_bot
 
 
 
@@ -145,7 +146,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
 
     elif response_type == 3:
-        
+
         print("3") 
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
@@ -214,31 +215,8 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         update.message.reply_text(ai_text)
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
 
-def setup_bot(bot_data):
-    bot_token = bot_data['api_key']
-    system_message = bot_data['system_message']
-    bot_id = bot_data['id']
 
-    # Instantiate a Telegram Bot object
-    bot = Bot(token=bot_token)
 
-    updater = Updater(token=bot_token, use_context=True)
-    dispatcher = updater.dispatcher
-
-    video_handler = CommandHandler('video', send_video)
-    
-    start_handler = CommandHandler('start', partial(start, bot_id))
-
-    
-    message_handler = MessageHandler(Filters.text & (~Filters.command), partial(handle_message, bot_id))
-
-    dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(message_handler)
-    dispatcher.add_handler(video_handler)
-
-    updater.start_polling()
-
-    return updater
 
 # Fetch all the API keys and system messages
 result = getAllKeys()
@@ -251,7 +229,6 @@ updaters = []
 # Setup a bot for each token
 for bot in bot_data:
     print(bot)
-    
     bot_id = bot['id']
     updater = setup_bot(bot)
     updaters.append(updater)
