@@ -12,6 +12,8 @@ from createUser import createUser
 from botVariables import getSystemMessage, getAPIKey, getAllKeys
 from functools import partial
 from getImages import getSFW
+from threading import Thread
+
 
 
 
