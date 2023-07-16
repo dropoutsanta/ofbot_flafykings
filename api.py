@@ -11,8 +11,9 @@ bots = {}
 def add_bot():
     print("RUNNNNNNNNING")
     bot_data = request.json
-    return jsonify({"message": "Bot added successfully"}), 200
     print(bot_data)
+    return jsonify({"message": "Bot added successfully"}), 200
+    
     if bot_data:
         bot_id = bot['id']
         updater = setup_bot(bot_data)
