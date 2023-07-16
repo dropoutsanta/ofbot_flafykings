@@ -7,6 +7,8 @@ from telegram import InputFile
 import random
 import json
 from superbase import sendToDB
+from chatSummary import upDateSummaryGPT
+from createUser import createUser
 
 
 # Instantiate a Telegram Bot object
@@ -22,6 +24,15 @@ def send_video(update, context, vid_path):
 
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Hello World!')
+    user = update.message.from_user
+    print("USER")
+    print(user)
+    user_id = user.id
+    username = user.username
+    first_name = user.first_name
+    last_name = user.last_name
+    language_code = user.language_code
+    createUser(user_id, username, first_name, last_name, language_code)
 
 def handle_message(update: Update, context: CallbackContext) -> None:
     # This function will be called whenever the bot receives a message.
@@ -30,7 +41,8 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     # Get the conversation history from the context, or initialize it if it doesn't exist.
     chat_id = update.message.chat_id
     sendToDB(chatId=chat_id, message=text, senderType="user")
-
+    
+    newSummary = upDateSummaryGPT()
     if "conversation" not in context.chat_data:
         context.chat_data["conversation"] = [
             {
@@ -50,15 +62,25 @@ You respond on a adult-oriented platform. You should be able to engage users in 
 
 When our conversation turns more sensual or erotic. If the context is appropriate, you can then ask, 'Would you like to view a video to enhance your experience?' This offer should only be made when the conversation is already in a more adult-oriented direction. You may also send sexy pictures and selfie."""},
         ]
-
+    systemAndLastFourMessages = []
+    systemMessage = context.chat_data["conversation"][0]
+    systemAndLastFourMessages.append(systemMessage)
     context.chat_data["conversation"].append({"role": "user", "content": text})
 
     # Prepare the API prompt using the conversation history.
     prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][4:])
     
-    messages = context.chat_data["conversation"]
+    messages = context.chat_data["conversation"][-4:][1:]
+    print("MESSAGES")
+    print(messages)
+    for message in messages:
+        systemAndLastFourMessages.append(message)
 
-    result = callGPT(messages)
+    print("MESSAGES SENT")
+    print(systemAndLastFourMessages)
+    
+
+    result = callGPT(systemAndLastFourMessages)
     print(result)
     response_type = check_response_type(result)
     if response_type == 1:
@@ -107,6 +129,7 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=userQuestion, senderType="assistant")
         sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant")
+        context.chat_data["conversation"].append({"role": "assistant", "content": userQuestion})
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
         
     elif response_type == 4:
@@ -118,6 +141,7 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         sendToDB(chatId=chat_id, message=thankyou, senderType="assistant")
         sendToDB(chatId=chat_id, message=compliment, senderType="assistant")
         context.chat_data["conversation"].append({"role": "assistant", "content": thankyou})
+        context.chat_data["conversation"].append({"role": "assistant", "content": compliment})
     elif response_type == 5:
         answerUser = result['answerUser']
         assistantQuestion = result['assistantQuestion']
@@ -125,7 +149,9 @@ When our conversation turns more sensual or erotic. If the context is appropriat
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=answerUser, senderType="assistant")
         sendToDB(chatId=chat_id, message=assistantQuestion, senderType="assistant")
+        context.chat_data["conversation"].append({"role": "assistant", "content": answerUser})
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
+
     elif response_type == 6:
         send_video(update, context, 'erica.mp4')
         ai_text = result['offer']

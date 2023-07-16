@@ -235,6 +235,10 @@ NSFW+: is a video of you having sex""",
             answerUser=function_args.get("answerUser"),
             assistantQuestion=function_args.get("assistantQuestion"),
         )
+        if function_name == "unknown":
+            function_response = fuction_to_call(
+            text=function_args.get("text")
+        )
         return json.loads(function_response)
 
         # Step 4: send the info on the function call and function response to GPT
