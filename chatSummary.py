@@ -17,11 +17,13 @@ Summary: {summary}
 New message: {newText}"""
     }
     ]
-    second_response = openai.ChatCompletion.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=messages,
     )  # get a new response from GPT where it can see the function response
-    return second_response
+    response_message = response["choices"][0]["message"]
+    return response_message
+    
 
 def updateSummaryDB(summary):
     url = "https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users?user_id=eq.123"
