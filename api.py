@@ -10,8 +10,13 @@ bots = {}
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
     print("RUNNNNNNNNING")
-    return 
-    bot_token = request.json.get('bot_token')
+    bot_data = request.json
+    print(bot_data)
+    return
+    bot_token = bot_data['api_key']
+    system_message = bot_data['system_message']
+    bot_id = bot_data['id']
+   
     if bot_token:
         bot_id = bot['id']
         updater = setup_bot(bot)
