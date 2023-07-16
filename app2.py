@@ -239,6 +239,7 @@ def setup_bot(bot_data):
     updater.start_polling()
 
     return updater
+updaters = []
     
 if __name__ == "__main__":
     # Fetch all the API keys and system messages
@@ -247,7 +248,7 @@ if __name__ == "__main__":
     print(result)
     bot_data = [{'api_key': row['telegram_API_key'], 'system_message': row['system_message'], 'id': row['id']} for row in result]
 
-    updaters = []
+
 
     # Setup a bot for each token
     for bot in bot_data:
