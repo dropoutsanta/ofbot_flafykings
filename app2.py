@@ -145,6 +145,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         summaryDBResult = updateSummaryDB(newSummary, chat_id, bot_id)
 
     elif response_type == 3:
+        
         print("3") 
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
