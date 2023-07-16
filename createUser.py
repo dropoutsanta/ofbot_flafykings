@@ -1,9 +1,10 @@
 import requests
 import json
 
-url = "https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users"
+
 
 def createUser(userId, username, first_name, last_name, language_code):
+    url = "https://citeifmttmdotbcsotyh.supabase.co/rest/v1/users"
     payload = json.dumps({
     "user_id": userId,
     "username": username,
@@ -19,3 +20,4 @@ def createUser(userId, username, first_name, last_name, language_code):
     response = requests.request("POST", url, headers=headers, data=payload)
 
     print(response.text)
+

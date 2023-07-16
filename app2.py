@@ -7,7 +7,7 @@ from telegram import InputFile
 import random
 import json
 from superbase import sendToDB
-from chatSummary import upDateSummaryGPT
+from chatSummary import upDateSummaryGPT, getSummary, updateSummaryDB
 from createUser import createUser
 
 
@@ -41,8 +41,12 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     # Get the conversation history from the context, or initialize it if it doesn't exist.
     chat_id = update.message.chat_id
     sendToDB(chatId=chat_id, message=text, senderType="user")
-    
-    newSummary = upDateSummaryGPT()
+    summary = getSummary(chat_id)
+    print("SUMMARY")
+    print(summary)
+    # Get new summary
+    newSummary = upDateSummaryGPT(summary, text)
+    summaryDBResult = updateSummaryDB(newSummary)
     if "conversation" not in context.chat_data:
         context.chat_data["conversation"] = [
             {
