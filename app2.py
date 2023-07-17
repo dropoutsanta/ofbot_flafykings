@@ -55,7 +55,7 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
 def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens):
-    sendToDB(chatId, message, senderType, bot_id)
+    sendToDB(chatId, message, senderType, bot_id, total_tokens)
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
     newSummary = upDateSummaryGPT(summary, resumeText)
