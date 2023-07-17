@@ -33,7 +33,7 @@ def uploadImagesToVDB(bot_id):
     count = 0
     embeddings = []
     idToString = str(bot_id)
-    index.delete(deleteAll='true', namespace='{idToString}-picture')
+    index.delete(deleteAll='true', namespace=f'{idToString}-picture')
     imagesData = getSFW(bot_id)
 
     for text in imagesData:
