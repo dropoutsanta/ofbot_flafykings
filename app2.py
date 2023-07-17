@@ -175,19 +175,18 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         occurance = getVoiceOccurance(bot_id)
         if occurance != 0 and occurance is not None:
             send_voice = random.randint(1, occurance) == 1
-        
-        if send_voice:
-            # Convert text to speech using Eleven Labs API
-            # Convert text to speech using Eleven Labs API
-            audio = generate(
-                text=ai_text,
-                voice="Bella", # or whichever voice you want to use, 
-            )
-            fp = BytesIO(audio)
-            fp.name = "response.ogg"
-            update.message.reply_voice(voice=fp)
-        else: 
-            update.message.reply_text(ai_text)
+            if send_voice:
+                # Convert text to speech using Eleven Labs API
+                # Convert text to speech using Eleven Labs API
+                audio = generate(
+                    text=ai_text,
+                    voice="Bella", # or whichever voice you want to use, 
+                )
+                fp = BytesIO(audio)
+                fp.name = "response.ogg"
+                update.message.reply_voice(voice=fp)
+            else: 
+                update.message.reply_text(ai_text)
         
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
