@@ -54,7 +54,7 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     language_code = user.language_code
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
-def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, media_url):
+def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, media_url=None):
     sendToDB(chatId, message, senderType, bot_id, total_tokens, media_url)
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
@@ -67,7 +67,7 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, 
     memoryDBResult = updateMemoryDB(newMemory, chatId, bot_id)
 
 # Define a new function to handle this in a new thread
-def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url):
+def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url=None):
     Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id, total_tokens, media_url)).start()
 
 def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText):
