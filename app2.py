@@ -173,8 +173,9 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         loaded = json.loads(result)
         ai_text = loaded['content']
         occurance = getVoiceOccurance(bot_id)
-        send_voice = random.randint(1, occurance) == 1
-
+        if occurance != 0 and is not None:
+            send_voice = random.randint(1, occurance) == 1
+        
         if send_voice:
             # Convert text to speech using Eleven Labs API
             # Convert text to speech using Eleven Labs API
