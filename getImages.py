@@ -1,5 +1,6 @@
 import requests
 import json
+
 def getSFW(bot_id):
     url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/media?bot_id=eq.{bot_id}"
 
@@ -16,3 +17,4 @@ def getSFW(bot_id):
     print(jsonValue)
    
     return jsonValue
+

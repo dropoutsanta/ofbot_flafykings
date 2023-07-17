@@ -115,8 +115,7 @@ def run_conversation(messages, chatId, bot_id):
             "question": question,
             "compliments": compliment,
             "user_info": userInfo,
-            "offer": offer,
-            "unknown": unknown
+            "offer": offer
         }  # only one function in this example, but you can have multiple
         function_name = response_message["function_call"]["name"]
         fuction_to_call = available_functions[function_name]
@@ -142,10 +141,7 @@ def run_conversation(messages, chatId, bot_id):
             answerUser=function_args.get("answerUser"),
             assistantQuestion=function_args.get("assistantQuestion"),
         )
-        if function_name == "unknown":
-            function_response = fuction_to_call(
-            text=function_args.get("text")
-        )
+       
         return json.loads(function_response)
 
         # Step 4: send the info on the function call and function response to GPT

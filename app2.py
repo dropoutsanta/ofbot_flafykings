@@ -9,11 +9,19 @@ import json
 from superbase import sendToDB
 from chatSummary import upDateSummaryGPT, getSummary, updateSummaryDB
 from createUser import createUser
-from botVariables import getSystemMessage, getAPIKey, getAllKeys
+from botVariables import getSystemMessage, getAPIKey, getAllKeys, getVoiceOccurance
 from functools import partial
 from getImages import getSFW
 from threading import Thread
+from queryVector import queryVectorImage, queryVectorText
+from chatMemory import upDateMemoryGPT, getMemory, updateMemoryDB
+from chatPersonality import upDatePersonalityGPT, getPersonality, updatePersonalityDB
+from gptFormat import formatAnswer
+from elevenlabs import generate, set_api_key
+from io import BytesIO
+import random
 
+set_api_key("af592672bccdfbdb8bae883c6fe1d76e") 
 
 
 
@@ -51,8 +59,12 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id):
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
     newSummary = upDateSummaryGPT(summary, resumeText)
-    print(newSummary)
+    memory = getMemory(chatId, bot_id)
+    newMemory = upDateMemoryGPT(memory, resumeText)
+    print("MEMORY")
+    print(newMemory)
     summaryDBResult = updateSummaryDB(newSummary, chatId, bot_id)
+    memoryDBResult = updateMemoryDB(newMemory, chatId, bot_id)
 
 # Define a new function to handle this in a new thread
 def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id):
@@ -61,12 +73,17 @@ def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id):
 def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText):
     sendToDB(chatId, message, senderType, bot_id)
     summary = getSummary(chatId, bot_id)
-    print("SUMMARY")
-    print(summary)
-    # Get new summary
     newSummary = upDateSummaryGPT(summary, resumeText)
-    print(newSummary)
     summaryDBResult = updateSummaryDB(newSummary, chatId, bot_id)
+
+    memory = getMemory(chatId, bot_id)
+    newMemory = upDateMemoryGPT(memory, message)
+    memoryDBResult = updateMemoryDB(newMemory, chatId, bot_id)
+
+    personality = getPersonality(chatId, bot_id)
+    newPersonality = upDatePersonalityGPT(personality, message)
+    personalityDBResult = updatePersonalityDB(newPersonality, chatId, bot_id)
+
 
 # Define a new function to handle this in a new thread
 def updateUserMessageAndSummaryAsync(chatId, message, senderType, bot_id, resumeText):
@@ -115,28 +132,34 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         print("1")
         classify_key = result['request']
         if classify_key == "SFW":
-            
+            metadata = queryVectorImage(text)
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
+            url = metadata['url']
             picture = picture_obj["url"]
-            send_image_url(update, context, picture)  # send the image
+            send_image_url(update, context, url)  # send the image
             
         if classify_key == "SFW+":
+            metadata = queryVectorImage(text)
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
             picture = picture_obj["url"]
-            send_image_url(update, context, picture)  # send the image
+            url = metadata['url']
+            send_image_url(update, context, url)  # send the image
             
             
         if classify_key == "NSFW":
-            randum_num = random.randint(1, 1)
-            img_path = f"naked/{str(randum_num)}.jpeg"
-            send_image(update, context, img_path)  # send the image
+            metadata = queryVectorImage(text)
+            url = metadata['url']
+            send_image_url(update, context, url)  # send the image
             
         if classify_key == "NSFW+":
-            send_video(update, context, 'ericafucking.mp4')
+            # send_video(update, context, 'ericafucking.mp4')
+            metadata = queryVectorImage(text)
+            url = metadata['url']
+            send_image_url(update, context, url) 
             
-            
+        
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id)
@@ -149,12 +172,33 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         print("2")
         loaded = json.loads(result)
         ai_text = loaded['content']
-        update.message.reply_text(ai_text)
+        occurance = getVoiceOccurance(bot_id)
+        send_voice = random.randint(1, occurance) == 1
+
+        if send_voice:
+            # Convert text to speech using Eleven Labs API
+            # Convert text to speech using Eleven Labs API
+            audio = generate(
+                text=ai_text,
+                voice="Bella", # or whichever voice you want to use, 
+            )
+            fp = BytesIO(audio)
+            fp.name = "response.ogg"
+            update.message.reply_voice(voice=fp)
+        else: 
+            update.message.reply_text(ai_text)
+        
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
 
     elif response_type == 3:
 
-        print("3") 
+        print("3")
+        questionResponse = queryVectorText(text)
+        questionResponseText = questionResponse['text']
+        result2 = formatAnswer(text,questionResponseText)
+        loaded = json.loads(result2)
+        ai_text = loaded['content']
+        update.message.reply_text(ai_text)
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantResponse})

@@ -28,7 +28,7 @@ def getFunctions():
             },
             {
                 "name": "question",
-                "description": "Every time the user asks you a question you call this function answer the question and ask a new one",
+                "description": "Every time the user asks you a personal question that requires additional information",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -94,20 +94,7 @@ def getFunctions():
                     "required": ["text"],
                 },
             },
-            {
-                "name": "unknown",
-                "description": "When you don't understant the user input or what the user id trying to say",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "text": {
-                            "type": "string",
-                            "description": "The user input",
-                        }
-                    },
-                    "required": ["text"],
-                },
-            },
+            
         ]
     return functions
 
@@ -156,6 +143,36 @@ def getSystemMessage(bot_id):
     result = jsonValue[0]['system_message']
     return result
 
+def getAutoBio(bot_id):
+    url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/bots?id=eq.{bot_id}"
+
+    payload = {}
+    headers = {
+    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpdGVpZm10dG1kb3RiY3NvdHloIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODk0NTE3MjMsImV4cCI6MjAwNTAyNzcyM30.H_4m6CyhusV_At9_MgBUXX-P3EUu-9TjgzxTmJHPMzw',
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    response_text = response.text
+    jsonValue = json.loads(response_text)
+    result = jsonValue[0]['autobiography']
+    return result
+
+def getVoiceOccurance(bot_id):
+    url = f"https://citeifmttmdotbcsotyh.supabase.co/rest/v1/bots?id=eq.{bot_id}"
+
+    payload = {}
+    headers = {
+    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpdGVpZm10dG1kb3RiY3NvdHloIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODk0NTE3MjMsImV4cCI6MjAwNTAyNzcyM30.H_4m6CyhusV_At9_MgBUXX-P3EUu-9TjgzxTmJHPMzw',
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    response_text = response.text
+    jsonValue = json.loads(response_text)
+    result = jsonValue[0]['voice_occurrence']
+    return result
+
 def getAllKeys():
     url = "https://citeifmttmdotbcsotyh.supabase.co/rest/v1/bots"
 
@@ -173,7 +190,7 @@ def getAllKeys():
         result = {
             "id": item["id"],
             "system_message": item["system_message"],
-            "telegram_API_key": item["telegram_API_key"]
+            "telegram_API_key": item["telegram_API_key"],
         }
         allValues.append(result)
 
@@ -182,4 +199,3 @@ def getAllKeys():
     return allValues
     
 
-getAllKeys()
