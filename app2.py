@@ -67,8 +67,8 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, 
     memoryDBResult = updateMemoryDB(newMemory, chatId, bot_id)
 
 # Define a new function to handle this in a new thread
-def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id):
-    Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id)).start()
+def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url):
+    Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id, total_tokens, media_url)).start()
 
 def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText):
     sendToDB(chatId, message, senderType, bot_id)
