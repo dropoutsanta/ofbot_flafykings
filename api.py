@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from telegram import Bot, Update
 from app2 import setup_bot, add_updater
 import app2
+from createEmbeddings import uploadImagesToVDB
 
 app = Flask(__name__)
 bots = {}
@@ -27,8 +28,10 @@ def add_bot():
 def modify_image():
     print("RUNNNNNNNNING")
     bot_data = request.json
-    
-    if bot_data:
+    id = bot_data['id']
+    result = uploadImagesToVDB(id)
+
+    if result == "Done":
         return jsonify({"message": "Bot added successfully"}), 200
     else:
         return jsonify({"message": "Bot not added successfully"}), 200
