@@ -70,8 +70,7 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, 
 def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url=None):
     Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id, total_tokens, media_url)).start()
 
-def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText):
-    sendToDB(chatId, message, senderType, bot_id)
+def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText, total_tokens=0, media_url=None):
     summary = getSummary(chatId, bot_id)
     newSummary = upDateSummaryGPT(summary, resumeText)
     summaryDBResult = updateSummaryDB(newSummary, chatId, bot_id)
@@ -86,8 +85,8 @@ def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText)
 
 
 # Define a new function to handle this in a new thread
-def updateUserMessageAndSummaryAsync(chatId, message, senderType, bot_id, resumeText):
-    Thread(target=updateUserMessageAndSummary, args=(chatId, message, senderType, bot_id, resumeText)).start()
+def updateUserMessageAndSummaryAsync(chatId, message, senderType, bot_id, resumeText,media_url=None):
+    Thread(target=updateUserMessageAndSummary, args=(chatId, message, senderType, bot_id, resumeText, media_url)).start()
 
 
 def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
@@ -99,34 +98,13 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
     text = update.message.text
     resumeText = f"{first_name} said: {text}"
     chat_id = update.message.chat_id
+    sendToDB(chatId=chat_id, message=text, senderType="user", bot_id=bot_id, total_tokens=0, media_url=None)
     updateUserMessageAndSummaryAsync(chatId=chat_id, message=text, senderType="user", bot_id=bot_id, resumeText=resumeText)
-    
-    systemMessage = getSystemMessage(bot_id=bot_id)
-    if "conversation" not in context.chat_data:
-        context.chat_data["conversation"] = [
-            {
-                "role": "system",
-                "content":systemMessage},
-        ]
-    systemAndLastFourMessages = []
-    
-    context.chat_data["conversation"].append({"role": "user", "content": text})
 
-    # Prepare the API prompt using the conversation history.
-    prompt = '\n'.join(item["content"] for item in context.chat_data["conversation"][4:])
-    
-    messages = context.chat_data["conversation"][-10:][1:]
-    print("MESSAGES")
-    print(messages)
-    for message in messages:
-        systemAndLastFourMessages.append(message)
-
-    print("MESSAGES SENT")
-    print(systemAndLastFourMessages)
-    
-
-    result, total_tokens = callGPT(systemAndLastFourMessages, chat_id, bot_id=bot_id)
+    result, total_tokens = callGPT(chat_id, bot_id=bot_id)
     print(result)
+    print("TOTAL TOKEN")
+    print(total_tokens)
     response_type = check_response_type(result)
     if response_type == 1:
         print("1")
@@ -187,26 +165,22 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
                 update.message.reply_voice(voice=fp)
             else: 
                 update.message.reply_text(ai_text)
-        
+       
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 3:
-
         print("3")
         questionResponse = queryVectorText(text)
         questionResponseText = questionResponse['text']
-        result2 = formatAnswer(text,questionResponseText)
+        #result2 = formatAnswer(text,questionResponseText)
         loaded = json.loads(result2)
         ai_text = loaded['content']
-        update.message.reply_text(ai_text)
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
-        context.chat_data["conversation"].append({"role": "assistant", "content": assistantResponse})
-        context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
-        resumeText = f"Kate said: {assistantResponse} and {assistantQuestion}"
+        resumeText = f"You said: {ai_text} and {assistantQuestion}"
         update.message.reply_text(assistantResponse)
         update.message.reply_text(assistantQuestion)
-        sendToDB(chatId=chat_id, message=assistantResponse, senderType="assistant", bot_id=bot_id)
+        sendToDB(chatId=chat_id, message=assistantResponse, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens, media_url=None)
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
         
     elif response_type == 4:
@@ -215,10 +189,8 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         compliment = result['compliment']
         update.message.reply_text(thankyou)
         update.message.reply_text(compliment)
-        sendToDB(chatId=chat_id, message=thankyou, senderType="assistant", bot_id=bot_id)
-        context.chat_data["conversation"].append({"role": "assistant", "content": thankyou})
-        context.chat_data["conversation"].append({"role": "assistant", "content": compliment})
-        resumeText = f"Kate said: {thankyou} and {compliment}"
+        sendToDB(chatId=chat_id, message=thankyou, senderType="assistant", bot_id=bot_id,total_tokens=total_tokens, media_url=None)
+        resumeText = f"You said: {thankyou} and {compliment}"
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=compliment, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 5:
@@ -226,10 +198,9 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         assistantQuestion = result['assistantQuestion']
         update.message.reply_text(answerUser)
         update.message.reply_text(assistantQuestion)
-        sendToDB(chatId=chat_id, message=answerUser, senderType="assistant", bot_id=bot_id)
-        context.chat_data["conversation"].append({"role": "assistant", "content": answerUser})
-        context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
-        resumeText = f"Kate said: {answerUser} and {assistantQuestion}"
+        sendToDB(chatId=chat_id, message=answerUser, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens, media_url=None)
+       
+        resumeText = f"You said: {answerUser} and {assistantQuestion}"
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
 
@@ -237,19 +208,19 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         send_video(update, context, 'erica.mp4')
         ai_text = result['offer']
         update.message.reply_text(ai_text)
-        context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
-        resumeText = f"Kate said: {ai_text}"
+       
+        resumeText = f"You said: {ai_text}"
         updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 7:
         update.message.reply_text("?")
-        context.chat_data["conversation"].append({"role": "assistant", "content": "?"})
+
    
 
     elif response_type == 0:
         ai_text = "error"
         update.message.reply_text(ai_text)
-        context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
+     
 
 def setup_bot(bot_data):
     bot_token = bot_data['api_key']
@@ -285,13 +256,12 @@ def add_updater(updater):
 if __name__ == "__main__":
     # Fetch all the API keys and system messages
     result = getAllKeys()
-    print("RESULTSSSS")
-    print(result)
+    
     bot_data = [{'api_key': row['telegram_API_key'], 'system_message': row['system_message'], 'id': row['id']} for row in result]
 
     # Setup a bot for each token
     for bot in bot_data:
-        print(bot)
+       
         bot_id = bot['id']
         updater = setup_bot(bot)
         add_updater(updater)

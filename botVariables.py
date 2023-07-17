@@ -194,7 +194,7 @@ def getAllKeys():
         }
         allValues.append(result)
 
-    print(allValues)
+  
     
     return allValues
     

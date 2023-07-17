@@ -52,10 +52,9 @@ def getMemory(chatId, bot_id):
     response = requests.request("GET", url, headers=headers, data=payload)
     response_text = response.text
     jsonValue = json.loads(response_text)
-    print(jsonValue)
+    
     result = jsonValue[0]['conversation_memory']
-    print("CONVERSATION MEMORY")
-    print(result)
+   
    
     return result
 

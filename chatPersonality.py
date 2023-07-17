@@ -23,8 +23,7 @@ Updated personality:"""
         messages=messages,
     )  # get a new response from GPT where it can see the function response
     response_message = response["choices"][0]["message"]['content']
-    print("LLM OUT PERSONALITY")
-    print(response_message)
+   
     return response_message
     
 
@@ -54,10 +53,9 @@ def getPersonality(chatId, bot_id):
     response = requests.request("GET", url, headers=headers, data=payload)
     response_text = response.text
     jsonValue = json.loads(response_text)
-    print(jsonValue)
+   
     result = jsonValue[0]['conversation_personality']
-    print("USER PERSONALITY")
-    print(result)
+    
    
     return result
 

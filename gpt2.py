@@ -3,15 +3,15 @@ import json
 import os
 from botVariables import getFunctions,getSystemMessage
 from chatSummary import getSummary
+from superbase import getLastMessages
 
 openAIKey = os.environ.get('OPEN_AI_KEY')
 openai.api_key = openAIKey
 
 
 
-def callGPT(messages, chatId, bot_id):
-    print("Running")
-    result = run_conversation(messages, chatId, bot_id)
+def callGPT(chatId, bot_id):
+    result = run_conversation(chatId, bot_id)
     return result
 
 # Example dummy function hard coded to return the same weather
@@ -77,14 +77,14 @@ def unknown(text):
      print("UNKNOWN")
      return json.dumps(result)
 
-def run_conversation(messages, chatId, bot_id):
+def run_conversation(chatId, bot_id):
     # Step 1: send the conversation and available functions to GPT
     # messages = [{"role": "user", "content": "Send a picture"}]
+    messages = getLastMessages(chatId, bot_id)
     systemMessage = getSystemMessage(bot_id=bot_id)
     summaryText = getSummary(chatId, bot_id)
     finalSystemMessage = systemMessage + "\n" + "Chat Summary: " + summaryText
-    print("SYSTEM MESSAGE")
-    print(finalSystemMessage)
+    
     allMessages = [
             {
                 "role": "system",
@@ -94,8 +94,10 @@ def run_conversation(messages, chatId, bot_id):
         allMessages.append(message)
     
     functions = getFunctions()
+    print("GOING IN THE MODEL FINAL")
+    print(allMessages)
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
+        model="gpt-4",
         messages=allMessages,
         functions=functions,
         function_call="auto",  # auto is default, but we'll be explicit
@@ -103,7 +105,7 @@ def run_conversation(messages, chatId, bot_id):
     
     response_message = response["choices"][0]["message"]
     total_tokens = response['usage']['total_tokens']
-    print(response_message)
+    
     
     # Step 2: check if GPT wanted to call a function
     if response_message.get("function_call"):

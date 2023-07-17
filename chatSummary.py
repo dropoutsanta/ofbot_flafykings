@@ -51,10 +51,9 @@ def getSummary(chatId, bot_id):
     response = requests.request("GET", url, headers=headers, data=payload)
     response_text = response.text
     jsonValue = json.loads(response_text)
-    print(jsonValue)
+    
     result = jsonValue[0]['conversation_summary']
-    print("CONVERSATION SUMMARY")
-    print(result)
+    
    
     return result
 
