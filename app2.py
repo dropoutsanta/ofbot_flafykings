@@ -54,8 +54,8 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     language_code = user.language_code
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
-def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens):
-    sendToDB(chatId, message, senderType, bot_id, total_tokens)
+def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, media_url):
+    sendToDB(chatId, message, senderType, bot_id, total_tokens, media_url)
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
     newSummary = upDateSummaryGPT(summary, resumeText)
@@ -162,7 +162,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens, media_url=metadata['url'])
 
 
 
