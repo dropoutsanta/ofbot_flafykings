@@ -5,8 +5,6 @@ from botVariables import getFunctions,getSystemMessage
 from chatSummary import getSummary
 
 openAIKey = os.environ.get('OPEN_AI_KEY')
-
-# Ensure that you've set your OpenAI API key
 openai.api_key = openAIKey
 
 
@@ -104,6 +102,7 @@ def run_conversation(messages, chatId, bot_id):
     )
     
     response_message = response["choices"][0]["message"]
+    total_tokens = response['usage']['total_tokens']
     print(response_message)
     
     # Step 2: check if GPT wanted to call a function
@@ -142,7 +141,7 @@ def run_conversation(messages, chatId, bot_id):
             assistantQuestion=function_args.get("assistantQuestion"),
         )
        
-        return json.loads(function_response)
+        return json.loads(function_response), total_tokens
 
         # Step 4: send the info on the function call and function response to GPT
         messages.append(response_message)  # extend conversation with assistant's reply
@@ -159,6 +158,6 @@ def run_conversation(messages, chatId, bot_id):
         )  # get a new response from GPT where it can see the function response
         return second_response
     else: 
-        return json.dumps(response_message)
+        return json.dumps(response_message), total_tokens
 
 

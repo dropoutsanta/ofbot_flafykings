@@ -54,7 +54,7 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     language_code = user.language_code
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
-def updateDatabaseAndSummary(chatId, message, senderType, bot_id):
+def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens):
     sendToDB(chatId, message, senderType, bot_id)
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
@@ -125,7 +125,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
     print(systemAndLastFourMessages)
     
 
-    result = callGPT(systemAndLastFourMessages, chat_id, bot_id=bot_id)
+    result, total_tokens = callGPT(systemAndLastFourMessages, chat_id, bot_id=bot_id)
     print(result)
     response_type = check_response_type(result)
     if response_type == 1:
@@ -162,7 +162,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         
         mediacaption = result['mediacaption']
         update.message.reply_text(mediacaption)
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=mediacaption, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
 
 
@@ -188,7 +188,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         else: 
             update.message.reply_text(ai_text)
         
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 3:
 
@@ -207,7 +207,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         update.message.reply_text(assistantResponse)
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=assistantResponse, senderType="assistant", bot_id=bot_id)
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
         
     elif response_type == 4:
         print("4")
@@ -219,7 +219,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         context.chat_data["conversation"].append({"role": "assistant", "content": thankyou})
         context.chat_data["conversation"].append({"role": "assistant", "content": compliment})
         resumeText = f"Kate said: {thankyou} and {compliment}"
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=compliment, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=compliment, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 5:
         answerUser = result['answerUser']
@@ -230,7 +230,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         context.chat_data["conversation"].append({"role": "assistant", "content": answerUser})
         context.chat_data["conversation"].append({"role": "assistant", "content": assistantQuestion})
         resumeText = f"Kate said: {answerUser} and {assistantQuestion}"
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=assistantQuestion, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
 
     elif response_type == 6:
@@ -239,7 +239,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         update.message.reply_text(ai_text)
         context.chat_data["conversation"].append({"role": "assistant", "content": ai_text})
         resumeText = f"Kate said: {ai_text}"
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id)
+        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
 
     elif response_type == 7:
         update.message.reply_text("?")
