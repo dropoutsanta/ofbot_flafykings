@@ -37,8 +37,8 @@ def uploadImagesToVDB(bot_id):
     imagesData = getSFW(bot_id)
 
     for text in imagesData:
-        count+=1
-        if text['description']:
+         count+=1
+         if text['description']:
                 print(text['description'])
                 embed = getEmbeddings(text['description'])
                 result = {
@@ -47,7 +47,7 @@ def uploadImagesToVDB(bot_id):
                 'metadata': {'description': text['description'], "url": text['url']},
         }
                 embeddings.append(result)
-        else:
+         else:
                 print("No value")
     
     upsert_response = index.upsert(
