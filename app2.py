@@ -173,7 +173,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         loaded = json.loads(result)
         ai_text = loaded['content']
         occurance = getVoiceOccurance(bot_id)
-        if occurance != 0 and is not None:
+        if occurance != 0 and occurance is not None:
             send_voice = random.randint(1, occurance) == 1
         
         if send_voice:
