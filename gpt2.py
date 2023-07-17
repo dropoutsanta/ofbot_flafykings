@@ -95,7 +95,7 @@ def run_conversation(messages, chatId, bot_id):
     
     functions = getFunctions()
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo-0613",
         messages=allMessages,
         functions=functions,
         function_call="auto",  # auto is default, but we'll be explicit
