@@ -27,3 +27,4 @@ gunicorn
 flask
 elevenlabs
 pinecone-client
+langchain
