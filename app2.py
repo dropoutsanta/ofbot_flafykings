@@ -173,8 +173,8 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         questionResponse = queryVectorText(text)
         questionResponseText = questionResponse['text']
         #result2 = formatAnswer(text,questionResponseText)
-        loaded = json.loads(result2)
-        ai_text = loaded['content']
+        #loaded = json.loads(result2)
+        #ai_text = loaded['content']
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
         resumeText = f"You said: {ai_text} and {assistantQuestion}"
