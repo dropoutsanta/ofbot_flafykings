@@ -32,7 +32,8 @@ def getEmbeddings(text):
 def uploadImagesToVDB(bot_id):
     count = 0
     embeddings = []
-
+    idToString = str(bot_id)
+    index.delete(deleteAll='true', namespace='{idToString}-picture')
     imagesData = getSFW(bot_id)
 
     for text in imagesData:
@@ -48,7 +49,7 @@ def uploadImagesToVDB(bot_id):
                 embeddings.append(result)
         else:
                 print("No value")
-    idToString = str(bot_id)
+    
     upsert_response = index.upsert(
         vectors=embeddings,
         namespace=f'{idToString}-picture'
