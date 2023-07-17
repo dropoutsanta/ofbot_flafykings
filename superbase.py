@@ -13,7 +13,7 @@ def sendToDB(chatId, message, senderType, bot_id,total_tokens):
         "message": message,
         "sender": senderType,
         "bot_id": bot_id,
-        "total_tokens": total_tokens
+        "tokens_used": total_tokens
     }
 
     response = requests.post(supabase_url, headers=supabase_headers, data=json.dumps(payload))
