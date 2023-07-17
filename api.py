@@ -40,6 +40,7 @@ def modify_image():
    
 
 @app.route('/modify_bio', methods=['POST'])
+
 def modify_bio():
     
     print("RUNNNNNNNNING")
