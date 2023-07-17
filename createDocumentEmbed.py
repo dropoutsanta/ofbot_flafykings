@@ -37,25 +37,24 @@ def createDocEmbed(bot_id):
     count = 0
     embeddings = []
     for text in texts:
-    
-    count+=1
-    embed = getEmbeddings(text.page_content)
-    tupple = (str(count),embed,{"text": text.page_content})
-    result = {
-            'id': str(count),
-            'values': embed,
-            'metadata': {'text': text.page_content},
-    }
-    embeddings.append(result)
+        count+=1
+        embed = getEmbeddings(text.page_content)
+        tupple = (str(count),embed,{"text": text.page_content})
+        result = {
+                'id': str(count),
+                'values': embed,
+                'metadata': {'text': text.page_content},
+        }
+        embeddings.append(result)
 
-    idToString = str(bot_id)
-    index.delete(deleteAll='true', namespace=f'{idToString}-bio')
+        idToString = str(bot_id)
+        index.delete(deleteAll='true', namespace=f'{idToString}-bio')
 
-    upsert_response = index.upsert(
-        vectors=embeddings,
-        namespace=f'{idToString}-bio'
-    )
-    return "Done"
+        upsert_response = index.upsert(
+            vectors=embeddings,
+            namespace=f'{idToString}-bio'
+        )
+        return "Done"
 
 
 
