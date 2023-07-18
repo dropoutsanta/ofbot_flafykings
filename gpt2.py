@@ -83,7 +83,7 @@ def run_conversation(chatId, bot_id):
     messages = getLastMessages(chatId, bot_id)
     systemMessage = getSystemMessage(bot_id=bot_id)
     summaryText = getSummary(chatId, bot_id)
-    #finalSystemMessage = systemMessage + "\n" + "Chat Summary: " + summaryText
+   
     
     allMessages = [
             {
