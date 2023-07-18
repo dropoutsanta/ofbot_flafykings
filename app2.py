@@ -110,7 +110,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         print("1")
         classify_key = result['request']
         if classify_key == "SFW":
-            metadata = queryVectorImage(text)
+            metadata = queryVectorImage(text, bot_id)
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
             url = metadata['url']
@@ -118,7 +118,8 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
             send_image_url(update, context, url)  # send the image
             
         if classify_key == "SFW+":
-            metadata = queryVectorImage(text)
+            
+            metadata = queryVectorImage(text, bot_id)
             pictures = getSFW(bot_id)
             picture_obj = random.choice(pictures)
             picture = picture_obj["url"]
@@ -127,13 +128,13 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
             
             
         if classify_key == "NSFW":
-            metadata = queryVectorImage(text)
+            metadata = queryVectorImage(text, bot_id)
             url = metadata['url']
             send_image_url(update, context, url)  # send the image
             
         if classify_key == "NSFW+":
             # send_video(update, context, 'ericafucking.mp4')
-            metadata = queryVectorImage(text)
+            metadata = queryVectorImage(text, bot_id)
             url = metadata['url']
             send_image_url(update, context, url) 
             

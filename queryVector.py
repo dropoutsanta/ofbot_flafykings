@@ -4,12 +4,12 @@ from createEmbeddings import getEmbeddings
 
 pinecone.init(api_key="dfad2cf1-0731-415f-80dd-7e0588fb4c58", environment="asia-southeast1-gcp-free")
 
-def queryVectorImage(text):
+def queryVectorImage(text, bot_id):
     index = pinecone.Index("pictures")
-
+    botIdString = str(bot_id)
     embed = getEmbeddings(text)
     result = index.query(
-    namespace="2-picture",
+    namespace=f"{botIdString}-picture",
     vector=embed,
     top_k=1,
     include_values=True,
