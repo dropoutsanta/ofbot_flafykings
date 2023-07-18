@@ -20,6 +20,10 @@ from gptFormat import formatAnswer
 from elevenlabs import generate, set_api_key
 from io import BytesIO
 import random
+import soundfile as sf
+import os
+import tempfile
+import audioread
 
 set_api_key("af592672bccdfbdb8bae883c6fe1d76e") 
 
@@ -54,8 +58,8 @@ def start(bot_id,update: Update, context: CallbackContext) -> None:
     language_code = user.language_code
     createUser(user_id, username, first_name, last_name, language_code, bot_id)
 
-def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, media_url=None):
-    sendToDB(chatId, message, senderType, bot_id, total_tokens, media_url)
+def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, media_url=None, voice_seconds=0):
+    sendToDB(chatId, message, senderType, bot_id, total_tokens, media_url, voice_seconds)
     resumeText = f"Kate said: {message}"
     summary = getSummary(chatId, bot_id)
     newSummary = upDateSummaryGPT(summary, resumeText)
@@ -67,8 +71,8 @@ def updateDatabaseAndSummary(chatId, message, senderType, bot_id, total_tokens, 
     memoryDBResult = updateMemoryDB(newMemory, chatId, bot_id)
 
 # Define a new function to handle this in a new thread
-def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url=None):
-    Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id, total_tokens, media_url)).start()
+def updateDatabaseAndSummaryAsync(chatId, message, senderType, bot_id, total_tokens, media_url=None, voice_seconds=0):
+    Thread(target=updateDatabaseAndSummary, args=(chatId, message, senderType, bot_id, total_tokens, media_url, voice_seconds)).start()
 
 def updateUserMessageAndSummary(chatId, message, senderType, bot_id, resumeText, total_tokens=0, media_url=None):
     summary = getSummary(chatId, bot_id)
@@ -164,10 +168,28 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
                 fp = BytesIO(audio)
                 fp.name = "response.ogg"
                 update.message.reply_voice(voice=fp)
+                
+                with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                    f.write(fp.getbuffer())
+                    temp_name = f.name
+
+                # Use audioread to load the audio file
+                with audioread.audio_open(temp_name) as f:
+                    length_in_seconds = f.duration
+                print("LENGHT IN SEC")
+                print(length_in_seconds)
+
+                # Delete the temporary file
+                os.remove(temp_name)
+                updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens, voice_seconds=length_in_seconds)
+                
+               
             else: 
                 update.message.reply_text(ai_text)
+                updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
+
        
-        updateDatabaseAndSummaryAsync(chatId=chat_id, message=ai_text, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens)
+        
 
     elif response_type == 3:
         print("3")
@@ -178,7 +200,7 @@ def handle_message(bot_id, update: Update, context: CallbackContext) -> None:
         #ai_text = loaded['content']
         assistantResponse = result['assistantResponse']
         assistantQuestion = result['assistantQuestion']
-        resumeText = f"You said: {ai_text} and {assistantQuestion}"
+        resumeText = f"You said: {assistantResponse} and {assistantQuestion}"
         update.message.reply_text(assistantResponse)
         update.message.reply_text(assistantQuestion)
         sendToDB(chatId=chat_id, message=assistantResponse, senderType="assistant", bot_id=bot_id, total_tokens=total_tokens, media_url=None)
