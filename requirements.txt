@@ -28,5 +28,3 @@ flask
 elevenlabs
 pinecone-client
 langchain
-tempfile
-audioread
