@@ -28,3 +28,4 @@ flask
 elevenlabs
 pinecone-client
 langchain
+supabase
