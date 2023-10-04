@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
 from handlers.pineconeHandler import upsertPDFDocument
+from handlers.supabaseHandler import getBot, postBot, updateAutobiography, updateSystemMessage
 from setupFunctions import setupBot
 
 app = Flask(__name__)
-bots = {}
-
+updaters = []
 # @app.route('/add-bot', methods=['POST'])
 # @app.route('/delete-bot', methods=['POST'])
 # @app.route('/update-bot', methods=['POST'])
@@ -20,11 +20,13 @@ bots = {}
 
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
-    updaters = []
-    bot_data = request.json
-    
-    if bot_data:
-        updater = setupBot(bot_data)
+    if request.form:
+        telegramAPIKey = request.form['telegram_API_key']
+        systemMessage = request.form['system_message']
+        biography = request.form['autobiography']
+        bot = postBot(telegramAPIKey, systemMessage, biography).data[0]
+
+        updater = setupBot(bot)
         updaters.append(updater)
         return jsonify({"message": "Bot added successfully"}), 200
     else:
@@ -32,6 +34,30 @@ def add_bot():
    
 
         # Here you could add the logic to restart or update your service as necessary
+
+@app.route('/update_system_message', methods=['PATCH'])
+def update_system_message():
+    if request.form:
+        id = request.form['id']
+        systemMessage = request.form['system_message']
+
+        updateSystemMessage(id, systemMessage)
+
+        return jsonify({"message": "System message was updated successfully"}), 200
+    else:
+        return jsonify({"message": "System message was not updated successfully"}), 200
+
+@app.route('/update_autobiography', methods=['PATCH'])
+def update_autobiography():
+    if request.form:
+        id = request.form['id']
+        biography = request.form['autobiography']
+
+        updateAutobiography(id, biography)
+
+        return jsonify({"message": "Autobiography was updated successfully"}), 200
+    else:
+        return jsonify({"message": "Autobiography was not updated successfully"}), 200
 
 
 # @app.route('/modify_image', methods=['POST'])

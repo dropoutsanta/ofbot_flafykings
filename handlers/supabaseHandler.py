@@ -11,7 +11,6 @@ def getBot(botId):
 
     return response.data
 
-
 def getSystemMessage(botId):
     response = supabase.table('bots').select("system_message, autobiography").eq('id', botId).execute()
     bioAndSystemMessage = response.data[0]['system_message'] + " Here is your biography: " + response.data[0]['autobiography']
@@ -83,3 +82,23 @@ def postUser(user: User):
         "bot_id": user.botId,
     }
     supabase.table('users').insert(payload).execute()
+
+def postBot(telegramApiKey, systemMessage, biography):
+    payload = {
+        "telegram_API_key": telegramApiKey,
+        "system_message": systemMessage,
+        "autobiography": biography,
+    }
+    return supabase.table('bots').insert(payload).execute()
+
+def updateSystemMessage(botId, systemMessage):
+    payload = {
+        "system_message": systemMessage,
+    }
+    supabase.table('bots').update(payload).eq('id', botId).execute()
+
+def updateAutobiography(botId, biography):
+    payload = {
+        "autobiography": biography,
+    }
+    supabase.table('bots').update(payload).eq('id', botId).execute()

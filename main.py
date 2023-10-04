@@ -5,7 +5,7 @@ updaters = []
 
 if __name__ == "__main__":
     # Fetch all the API keys and system messages
-    bots = getBot(1)
+    bots = getAllBots()
 
     # Setup a bot for each token
     for bot in bots:
