@@ -20,10 +20,10 @@ updaters = []
 
 @app.route('/add_bot', methods=['POST'])
 def add_bot():
-    if request.form:
-        telegramAPIKey = request.form['telegram_API_key']
-        systemMessage = request.form['system_message']
-        biography = request.form['autobiography']
+    if request.json:
+        telegramAPIKey = request.json['telegram_API_key']
+        systemMessage = request.json['system_message']
+        biography = request.json['autobiography']
         bot = postBot(telegramAPIKey, systemMessage, biography).data[0]
 
         updater = setupBot(bot)
@@ -37,9 +37,9 @@ def add_bot():
 
 @app.route('/update_system_message', methods=['PATCH'])
 def update_system_message():
-    if request.form:
-        id = request.form['id']
-        systemMessage = request.form['system_message']
+    if request.json:
+        id = request.json['id']
+        systemMessage = request.json['system_message']
 
         updateSystemMessage(id, systemMessage)
 
@@ -49,9 +49,9 @@ def update_system_message():
 
 @app.route('/update_autobiography', methods=['PATCH'])
 def update_autobiography():
-    if request.form:
-        id = request.form['id']
-        biography = request.form['autobiography']
+    if request.json:
+        id = request.json['id']
+        biography = request.json['autobiography']
 
         updateAutobiography(id, biography)
 
