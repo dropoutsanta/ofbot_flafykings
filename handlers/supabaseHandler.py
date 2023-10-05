@@ -83,11 +83,12 @@ def postUser(user: User):
     }
     supabase.table('users').insert(payload).execute()
 
-def postBot(telegramApiKey, systemMessage, biography):
+def postBot(telegramApiKey, systemMessage, biography, username):
     payload = {
         "telegram_API_key": telegramApiKey,
         "system_message": systemMessage,
         "autobiography": biography,
+        "telegram_username": username
     }
     return supabase.table('bots').insert(payload).execute()
 

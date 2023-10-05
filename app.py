@@ -24,7 +24,8 @@ def add_bot():
         telegramAPIKey = request.json['telegram_API_key']
         systemMessage = request.json['system_message']
         biography = request.json['autobiography']
-        bot = postBot(telegramAPIKey, systemMessage, biography).data[0]
+        username = request.json['telegram_username']
+        bot = postBot(telegramAPIKey, systemMessage, biography, username).data[0]
 
         updater = setupBot(bot)
         updaters.append(updater)
